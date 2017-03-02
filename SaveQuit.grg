@@ -1,0 +1,26 @@
+previous_name = "a664ac58-bea0-11e4-9652-040112b6a801"
+
+loop = 1
+while loop
+  tv_GetProjectName
+  current_name = result
+
+  IF CMP(previous_name, current_name)==1
+    tv_Quit
+    loop = 0
+  ELSE
+    //tv_warn "Previous name not the same."
+  END
+
+  tv_GetProjectName
+  previous_name = result
+
+  if CMP(previous_name, "\")==1
+    tv_ProjectCurrentID
+    tv_ProjectClose result
+  ELSE
+    tv_SaveProject previous_name
+    tv_ProjectCurrentID
+    tv_ProjectClose result
+  END
+END

@@ -1,0 +1,221 @@
+
+//--------------------------------------------------
+
+// main
+
+//--------------------------------------------------
+
+//globals
+
+tv_ReadUserString "DeadlineConfig" "JobMode" "Sequence/Animation"
+jobMode = result
+
+tv_ReadUserString "DeadlineConfig" "StartFrame" "0"
+startFrame = result
+
+tv_ReadUserString "DeadlineConfig" "EndFrame" "0"
+endFrame = result
+
+tv_ReadUserString "DeadlineConfig" "UseCamera" "False"
+useCamera = result
+
+tv_ReadUserString "DeadlineConfig" "LayerName" ""
+deadlineLayerName = result
+
+
+padding = toZeroPaddedString('_',startFrame,5)
+
+initializeTVP()
+
+
+//check which job mode to use
+IF (CMP(jobMode, "Sequence/Animation") == 1) || (CMP(jobMode, "Single Image") == 1)
+    saveSequence()
+END
+
+IF (CMP(jobMode, "Export Layers") == 1)
+    exportLayers()
+END
+
+IF (CMP(jobMode, "Single Layer") == 1)
+    exportSingleLayer()
+END
+
+tv_ProjectCurrentID
+tv_ProjectClose result
+
+
+
+//--------------------------------------------------
+
+// member functions
+
+//--------------------------------------------------
+
+FUNCTION initializeTVP()
+
+    //get scenePath
+    tv_ReadUserString "DeadlineConfig" "ScenePath" "C:/Deadline7"
+    scenePath = '"'result'"'
+
+    //get format
+    tv_ReadUserString "DeadlineConfig" "ExportFormat" "JPEG"
+    format = result
+
+    //get AlphaSaveMode
+    tv_ReadUserString "DeadlineConfig" "AlphaSaveMode" "NoPreMultiply"
+    alphaSaveMode = result
+
+    //init
+    tv_MenuHide
+    tv_host2Back
+    loadProject(scenePath)
+    tv_Background "NONE"
+    tv_SaveMode format
+    tv_AlphaSaveMode alphaSaveMode
+END
+
+
+// This function keeps trying to load a project, until the project id has changed.
+// This is because loading the same project on two machines, can't be done at the same time.
+FUNCTION loadProject(path)
+  loop = 1
+  while loop
+    tv_ProjectCurrentID
+    blankProjectId = result
+    tv_LoadProject path
+    newProjectId = result
+    IF CMP(blankProjectId, newProjectId)==1
+      //tv_warn "Project load failed!"
+      PAUSE 1
+    ELSE
+      //tv_warn "Project load successful!"
+      loop = 0
+    END
+  END
+END
+
+
+FUNCTION saveSequence()
+
+    IF (CMP(jobMode, "Single Image") == 1) || (CMP(format, "AVI") == 1) || (CMP(format, "QUICKTIME") == 1) || (CMP(format, "GIF") == 1)
+        padding = ""
+    END
+
+    tv_ReadUserString "DeadlineConfig" "ExportPath" "C:/Deadline7"
+    exportPath = '"'result''padding'"'
+
+    //Check if tvpaint should use camera or not
+    IF (CMP(useCamera, "True") == 1)
+        tv_ProjectSaveSequence exportPath startFrame endFrame "camera"
+    ELSE
+        tv_SaveSequence exportPath startFrame endFrame
+    END
+
+END
+
+
+FUNCTION exportLayers()
+    //This changes a setting so that only the currently selected layer will display/render
+    tv_Display "current"
+
+    //It returns the previous display mode as a result, which can be saved and restored after the script is done.
+    display = result
+
+    FOR id = 1 to 10000
+        //Using the id, attempt to select a layer.
+        tv_LayerSet id
+
+        //Check if we successfully selected a layer
+        IF (CMP(result,'') == 1)
+            //Now get the information for the currently selected layer, just so we have the layerName
+            tv_LayerInfo
+            PARSE result layerDisplay layerPosition layerOpacity layerName layerType layerStart layerEnd layerPrelighttable layerPostlighttable
+
+            //Render frames now, since this is a real layer
+            tv_ReadUserString "DeadlineConfig" "ExportPath" "C:/Deadline7"
+            exportPath = '"'result''_''layerName'"'
+
+            //Check if tvpaint should use camera or not
+            IF (CMP(useCamera, "True") == 1)
+                tv_ProjectSaveSequence exportPath "camera"
+            ELSE
+                tv_SaveSequence exportPath
+            END
+
+        END
+    END
+
+    tv_Display result
+END
+
+
+FUNCTION exportSingleLayer()
+    // turning all layers off
+    loop= 1
+    i= 0
+    WHILE loop
+      	tv_LayerGetID i
+      	curLID= result
+      	IF CMP(curLID,"NONE")==0
+        		// START RUN ON LAYER
+            tv_LayerDisplay curLID "Off"
+        		// END RUN ON LAYER
+        		i= i+1
+      	ELSE
+        		loop=0
+      	END
+    END
+
+    // find and display single layer
+    loop= 1
+    i= 0
+    WHILE loop
+      	tv_LayerGetID i
+      	curLID= result
+      	IF CMP(curLID,"NONE")==0
+
+          	// START RUN ON LAYER
+          	tv_layerSet curLID
+            tv_LayerInfo
+            PARSE result layerDisplay layerPosition layerOpacity layerName layerType layerStart layerEnd layerPrelighttable layerPostlighttable layerSelection
+            IF CMP(layerName, deadlineLayerName)==1
+                tv_LayerDisplay curLID "On"
+            END
+            // END RUN ON LAYER
+        		i= i+1
+      	ELSE
+        		loop=0
+      	END
+    END
+
+    //getting export path
+    tv_ReadUserString "DeadlineConfig" "ExportPath" "C:/Deadline7"
+    exportPath = '"'result'"'
+
+    //Check if tvpaint should use camera or not
+    IF (CMP(useCamera, "True") == 1)
+        tv_ProjectSaveSequence exportPath "camera"
+    ELSE
+        tv_SaveSequence exportPath
+    END
+END
+
+
+FUNCTION toZeroPaddedString(prefix,digit,length)
+
+   LOCAL cur i
+   length=length*1
+   digit=digit*1
+   cur = LEN(digit)
+   length=length-1
+
+   FOR i=cur TO length
+      prefix=prefix"0"
+   END
+
+   prefix =prefix""digit
+   result = prefix
+
+   RETURN result
+END

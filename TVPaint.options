@@ -1,0 +1,86 @@
+[SceneFile]
+Type=filename
+Label=Scene Filename
+Category=Scene File
+Index=0
+Description=The scene filename as it exists on the network.
+Required=false
+DisableIfBlank=true
+
+[Version]
+Type=label
+Label=Version
+Category=Version Info
+Index=1
+Description=The version of TVPaint to render with.
+Required=false
+DisableIfBlank=true
+
+[OutputFile]
+Type=filenameSave
+Label=Output File
+Category=Output Options
+Index=0
+Description=The output filename path.
+Required=false
+DisableIfBlank=true
+Default=
+
+[OutputFormat]
+Type=enumeration
+Items=QUICKTIME;AVI;BMP;CINEON;DEEP;DPX;FLI;GIF;ILBM;JPEG;PCX;PNG;PSD;SGI;SOFTIMAGE;SUN;TGA;TIFF;VPB
+Label=Output Format
+Category=Output Options
+Index=1
+Description=The output format.
+Required=false
+DisableIfBlank=true
+
+[JobModeBox]
+Type=string
+Label=Job Mode
+Category=Rendering Options
+Index=0
+Description=The different TVPaint job modes supported by Deadline.
+Required=false
+DisableIfBlank=true
+
+[AlphaSaveModeBox]
+Type=enumeration 
+Items=NoPreMultiply;PreMultiply;NoAlpha;AlphaOnly;
+Label=Alpha Save Mode
+Category=Rendering Options
+Index=1
+Description=The different Alpha Save Mode's supported by TVPaint.
+Required=false
+DisableIfBlank=true
+
+[ScriptFile]
+Type=filename
+Label=Script File
+Category=Rendering Options
+Index=2
+Description=The render script to use.
+Required=false
+DisableIfBlank=true
+
+[UseCameraBox]
+Type=boolean
+Label=Use Scene Camera
+Category=Rendering Options
+Index=3
+Description=If this option is enabled, TVPaint only renders what's in the camera's frame.
+Required=false
+DisableIfBlank=true
+
+[Build]
+Type=enum
+Values=None;32bit;64bit
+Label=Build Of TVPaint To Force
+Category=File Options
+CategoryOrder=0
+Index=0
+Description=You can force 32 or 64 bit processing with this option.
+Required=true
+Default=None
+DisableIfBlank=false

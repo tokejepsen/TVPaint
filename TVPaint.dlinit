@@ -1,0 +1,6 @@
+﻿# General Plugin Settings
+About=TVPaint Plugin for Deadline
+ConcurrentTasks=True
+
+# TVPaint Specific Plugin Settings
+RenderExecutable11=C:\Program Files\TVPaint Developpement\TVPaint Animation 11 Pro (64bits)\TVPaint Animation 11 Pro (64bits).exe

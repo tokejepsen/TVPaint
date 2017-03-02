@@ -1,0 +1,9 @@
+[RenderExecutable11]
+Type=multilinemultifilename
+Category=Render Executables
+CategoryOrder=0
+CategoryIndex=2
+Label=TVPaint 11 Render Executable
+Default=C:\Program Files\TVPaint Developpement\TVPaint Animation 11 Pro (64bits)\TVPaint Animation 11 Pro (64bits).exe
+Description=The path to the TVPaint 11 executable file used for rendering. Enter alternative paths on separate lines.
+
